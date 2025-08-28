@@ -1,0 +1,32 @@
+name: Update Smartdns Blocklist
+
+on:
+  schedule:
+    - cron: '0 17 * * *' # 每天 UTC 17 点 ,北京时间凌晨 1 点
+  workflow_dispatch:     # 支持手动触发
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Git config
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Run generation script
+        run: bash scripts/tosmartdns.sh
+
+      - name: Commit and push changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            git add smartdns_blocklist.conf
+            git commit -m "🔄 Auto update smartdns blocklist ($(date -u +'%Y-%m-%d'))" || echo "No changes to commit"
+            git push
+          fi
