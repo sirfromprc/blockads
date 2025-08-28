@@ -24,6 +24,17 @@ awk '
 # 清理中间文件
 rm "$INPUT_FILE"
 
+# 要排除的域名
+EXCLUDE_DOMAINS=(
+  "adsense.google.com"
+  "optimize.google.com"
+)
+
+# 删除这些域名对应的行
+for domain in "${EXCLUDE_DOMAINS[@]}"; do
+    sed -i "/address \/${domain//\//\\/}\\/#/d" "$OUTPUT_FILE"
+done
+
 # 统计行数
 TOTAL_LINES=$(grep -c '^address /' "$OUTPUT_FILE")
 
