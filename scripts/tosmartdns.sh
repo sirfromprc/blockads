@@ -28,7 +28,7 @@ rm "$INPUT_FILE"
 TOTAL_LINES=$(grep -c '^address /' "$OUTPUT_FILE")
 
 # 生成时间戳
-TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+TIMESTAMP=$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')
 
 sed -i "1i# TOTAL_LINES=$TOTAL_LINES" "$OUTPUT_FILE"
 sed -i "1i# 生成时间: $TIMESTAMP" "$OUTPUT_FILE"
