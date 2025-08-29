@@ -28,6 +28,7 @@ rm "$INPUT_FILE"
 EXCLUDE_DOMAINS=(
   "adsense.google.com"
   "optimize.google.com"
+  "qun.qq.com"
 )
 
 # 删除这些域名对应的行
