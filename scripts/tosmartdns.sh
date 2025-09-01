@@ -30,6 +30,7 @@ EXCLUDE_DOMAINS=(
   "optimize.google.com"
   "qun.qq.com"
   "ptlogin2.qq.com"
+  "cdn.ark.qq.com"
 )
 
 # 删除这些域名对应的行
