@@ -33,6 +33,7 @@ EXCLUDE_DOMAINS=(
   "cdn.ark.qq.com"
   "apm.music.163.com"
   "httpdns.n.netease.com"
+  "music.httpdns.c.163.com"
 )
 
 # 删除这些域名对应的行
