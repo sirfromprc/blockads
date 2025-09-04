@@ -4,6 +4,8 @@
 URL="https://raw.githubusercontent.com/Elysian-Realme/FuGfConfig/refs/heads/main/ConfigFile/DataFile/FuckRogueSoftware/domain.txt"
 INPUT_FILE="domain.txt"
 OUTPUT_FILE="smartdns_blocklist.conf"
+WHITE_FILE="domain/white"
+BLACK_FILE="domain/black"
 
 # 下载源文件
 curl -sSL "$URL" -o "$INPUT_FILE"
@@ -25,7 +27,7 @@ awk '
 rm "$INPUT_FILE"
 
 # 排除域名和增加屏蔽域名
-awk -v white=../domain/white -v black=../domain/black '
+awk -v white="$WHITE_FILE" -v black="$BLACK_FILE" '
     BEGIN {
         while ((getline < white) > 0) {
             sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "")
@@ -50,7 +52,7 @@ awk -v white=../domain/white -v black=../domain/black '
         }
         next
     }
-' "$OUTPUT_FILE" ../domain/black > "$OUTPUT_FILE.new" && mv "$OUTPUT_FILE.new" "$OUTPUT_FILE"
+' "$OUTPUT_FILE" "$BLACK_FILE > "$OUTPUT_FILE.new" && mv "$OUTPUT_FILE.new" "$OUTPUT_FILE"
 
 # 统计行数
 TOTAL_LINES=$(grep -c '^address /' "$OUTPUT_FILE")
