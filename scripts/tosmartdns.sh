@@ -52,7 +52,7 @@ awk -v white="$WHITE_FILE" -v black="$BLACK_FILE" '
         }
         next
     }
-' "$OUTPUT_FILE" "$BLACK_FILE > "$OUTPUT_FILE.new" && mv "$OUTPUT_FILE.new" "$OUTPUT_FILE"
+' "$OUTPUT_FILE" "$BLACK_FILE" > "$OUTPUT_FILE.new" && mv "$OUTPUT_FILE.new" "$OUTPUT_FILE"
 
 # 统计行数
 TOTAL_LINES=$(grep -c '^address /' "$OUTPUT_FILE")
