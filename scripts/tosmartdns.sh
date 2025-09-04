@@ -24,22 +24,33 @@ awk '
 # 清理中间文件
 rm "$INPUT_FILE"
 
-# 要排除的域名
-EXCLUDE_DOMAINS=(
-  "adsense.google.com"
-  "optimize.google.com"
-  "qun.qq.com"
-  "ptlogin2.qq.com"
-  "cdn.ark.qq.com"
-  "apm.music.163.com"
-  "httpdns.n.netease.com"
-  "music.httpdns.c.163.com"
-)
+# 排除域名和增加屏蔽域名
+awk -v white=../domain/white -v black=../domain/black '
+    BEGIN {
+        while ((getline < white) > 0) {
+            sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "")
+            if ($0 != "") w[$0] = 1
+        }
+        close(white)
+    }
 
-# 删除这些域名对应的行
-for domain in "${EXCLUDE_DOMAINS[@]}"; do
-    sed -i "/address \/${domain//\//\\/}\\/#/d" "$OUTPUT_FILE"
-done
+    FILENAME == ARGV[1] {
+        for (d in w) {
+            if ($0 ~ d) next 
+        }
+        if (!seen[$0]++) print
+        next
+    }
+
+    FILENAME == black {
+        sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "")
+        if ($0 != "") {
+            line = "address /" $0 "/#"
+            if (!seen[line]++) print line
+        }
+        next
+    }
+' "$OUTPUT_FILE" ../domain/black > "$OUTPUT_FILE.new" && mv "$OUTPUT_FILE.new" "$OUTPUT_FILE"
 
 # 统计行数
 TOTAL_LINES=$(grep -c '^address /' "$OUTPUT_FILE")
