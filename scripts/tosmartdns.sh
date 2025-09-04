@@ -24,33 +24,40 @@ awk '
 # 清理中间文件
 rm "$INPUT_FILE"
 
-# 排除域名和增加屏蔽域名
-awk -v white=../domain/white -v black=../domain/black '
-    BEGIN {
-        while ((getline < white) > 0) {
-            sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "")
-            if ($0 != "") w[$0] = 1
-        }
-        close(white)
+# 排除域名和增加屏蔽域名并去重
+awk -v white="$WHITE_FILE" -v black="$BLACK_FILE" '
+BEGIN {
+    while ((getline line < white) > 0) {
+        sub(/#.*/, "", line)
+        gsub(/^[ \t]+|[ \t]+$/, "", line)
+        if (line != "") w[line] = 1
     }
+    close(white)
+}
 
-    FILENAME == ARGV[1] {
-        for (d in w) {
-            if ($0 ~ d) next 
+FILENAME == ARGV[1] {
+    skip=0
+    for (domain in w) {
+        if (index($0, domain) > 0) {
+            skip=1
+            break
         }
-        if (!seen[$0]++) print
-        next
     }
+    if (!skip && !seen[$0]++) print
+    next
+}
 
-    FILENAME == black {
-        sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "")
-        if ($0 != "") {
-            line = "address /" $0 "/#"
-            if (!seen[line]++) print line
-        }
-        next
+FILENAME == black {
+    line = $0
+    sub(/#.*/, "", line)
+    gsub(/^[ \t]+|[ \t]+$/, "", line)
+    if (line != "") {
+        formatted = "address /" line "/#"
+        if (!seen[formatted]++) print formatted
     }
-' "$OUTPUT_FILE" ../domain/black > "$OUTPUT_FILE.new" && mv "$OUTPUT_FILE.new" "$OUTPUT_FILE"
+    next
+}
+' "$OUTPUT_FILE" "$BLACK_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$OUTPUT_FILE"
 
 # 统计行数
 TOTAL_LINES=$(grep -c '^address /' "$OUTPUT_FILE")
